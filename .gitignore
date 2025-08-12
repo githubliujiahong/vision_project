@@ -1,0 +1,12 @@
+/test.py
+/**.toml
+/generate_config.py
+# **/__pycache__/**
+/yolo/models/__pycache__/**
+/yolo/utils/__pycache__/**
+/yolo/__pycache__/**
+/post_process/__pycache__/**
+/__pycache__/**
+/color_his.txt
+/record/**.mp4
+/models

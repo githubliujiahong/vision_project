@@ -1,0 +1,34 @@
+[camera]
+image_shape = [ 640, 640,]
+K = [ [ "359.5939157607298", "0.0", "301.6451181856762",], [ "0.0", "360.07140518351594", "318.815279514638",], [ "0.0", "0.0", "1.0",],]
+D = [ [ "-0.20194312387660904",], [ "0.06651302005754335",], [ "-0.05581727809855195",], [ "0.020328029770029316",],]
+alpha = 1.3
+id = 1
+rotate = false
+show_icon = false
+record_path = "record"
+record = false
+
+[decision]
+arm_length = 33
+match_distance = 3
+score_decrease_rate = 1.0
+score_increase_rate = 1.5
+safe_dis = 10
+balls_score_weight = [ 0.5, 1.0, 1.0, 1.8, 0.0, 1.0]  # 自信度、类别、存在存在时间、周围物体密度，这是参数啊~~~~~~~~=_=
+cubes_score_weight = [ 0.5, 1.0, 1.0, 2.0, 1.0, 2.0]  # 自信度、类别、存在存在时间、周围物体密度、边沿程度
+score_bias = 0.0  # 是否超出抓取范围
+dead_angle = 0 # 8.03
+edge_threshold = 30
+bigbox_R = 25.0
+
+[position_calculate]
+bigbox_R = 25.0
+edge_threshold = 10
+# 上大下小往负调，左大右小往大调
+c2b_vec = [ "1.8", "15",]
+arm_tilt = [ -1.1792424054864565, 0.9277362706697809, 0.0,]
+camera_height = 34.913509207060855
+ball_height = 5.517055639555977
+cube_height = 6.249529890580625
+box_height = 10.555930929472964

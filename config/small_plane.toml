@@ -1,0 +1,52 @@
+[camera]
+image_shape = [ 640, 640,]
+K = [
+    ["369.31504374", "0.0", "297.96267173"],
+    ["0.0", "368.38166622", "296.86035712"],
+    ["0.0", "0.0", "1.0"]
+]
+
+D = [
+    ["-0.13965422"],
+    ["-0.18668939"],
+    ["0.23885947"],
+    ["-0.09245664"]
+]
+alpha = 0.955
+id = 1  # "0"表示电脑相机
+rotate = false
+show_icon = false
+record_path = "record"
+record = true
+
+[decision]
+match_distance = 3
+score_decrease_rate = 5
+score_increase_rate = 3
+time_score_ceil = 10
+time_score_floor = 0
+arm_length = 33.1
+safe_dis = 15
+balls_score_weight = [ 0.5, 1.0, 1.0, 1.8, 0.0, 1.0]  # 自信度、类别、存在存在时间、周围物体密度
+cubes_score_weight = [ 0.5, 1.0, 1.0, 2.0, 1.0, 2.0]  # 自信度、类别、存在存在时间、周围物体密度、边沿程度
+score_bias = 0.0  # 是否超出抓取范围
+dead_angle = 0 # 8.03
+edge_threshold = 30
+bigbox_R = 25.0
+
+[position_calculate]
+c2b_vec = [ "-0.5791", "14.4288","0"]
+# 上大下小往负调，左大右小往大调
+bigbox_R = 25.0
+edge_threshold = 10
+arm_tilt = [ 0.062179414181791216, 1.888374202901748, 0.0,]
+camera_height = 34
+ball_height = 5.2
+cube_height = 5.8
+box_height = 10.386053721110034
+T_BA= [
+    [9.99968705e-01, 2.61277890e-03, 7.46748156e-03, -2.43215912e-04],
+    [-2.57593314e-03, 9.99984483e-01, -4.93952690e-03, 1.41405159e-01],
+    [-7.48027158e-03, 4.92013658e-03, 9.99959918e-01, -1.71879086e-12],
+    [0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
+]
