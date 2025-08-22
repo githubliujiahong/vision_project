@@ -57,10 +57,14 @@ class Serial(QThread):
 
         ROOT = 	os.getcwd()
         self.config = toml.load(os.path.join(ROOT, "config", "serial.toml"))
+
+
         self.baudrate = self.config["baudrate"]
         self.port_name = self.config["port_name"]
         self.data_length = self.config["data_length"]
-        config = toml.load(os.path.join(ROOT, "config", "config.toml"))  
+        config = toml.load(os.path.join(ROOT, "config", "config.toml"))
+        self.arm_config = config["specific_config"]
+        self.arm_length = self.arm_config["decision"]["arm_length"]  
 
         self.position = [0, 0] # ?
         self.stop = False
@@ -144,8 +148,7 @@ class Serial(QThread):
     def get_new_protocol(self, order, R, theta):
         theta_degree = (theta) / np.pi * 180
         print(f"raw:{theta_degree = }, {R = }")
-        # R_protocol = R / 34.4 * 127
-        R_protocol = R / 33.1 * 127
+        R_protocol = R / self.arm_length * 127
 
         print(f"{R_protocol = }")
         if theta_degree < 0:

@@ -10,7 +10,7 @@ record_path = "record"
 record = false
 
 [decision]
-arm_length = 34.4
+arm_length = 34.1
 match_distance = 3
 score_decrease_rate = 1.0
 score_increase_rate = 1.5
