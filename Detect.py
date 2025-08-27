@@ -66,7 +66,6 @@ class Detector(QThread):
             self.publisher.publish(numpy_like, 0.01)
 
     def _merge_detection_results(self, boxes, boxes_ball):
-        """合并两个模型的检测结果"""
         if boxes is not None and len(boxes) > 0:
             main_detections = np.zeros((len(boxes), 6), dtype=np.float32)
             main_detections[:, :4] = boxes.xyxy  # 边界框坐标
