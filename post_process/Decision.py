@@ -1,7 +1,7 @@
 import Bridge, Debug, Position_calculate
 import numpy as np
 import time
-import Decision_v2
+# import Decision_v2
 
 
 
@@ -273,12 +273,12 @@ class Decision_maker():
                 self.cubes[0].is_target = True
         
         if len(self.balls) != 0:
-            Decision_v2.The_last_dec(self.balls[0],self.balls,self.cubes).decide()
+            # Decision_v2.The_last_dec(self.balls[0],self.balls,self.cubes).decide()
             self.ball_pub.publish(self.balls[0].pix)
         else:
             self.ball_pub.publish(None)
         if len(self.cubes) != 0:
-            Decision_v2.The_last_dec(self.cubes[0],self.balls,self.cubes).decide()
+            # Decision_v2.The_last_dec(self.cubes[0],self.balls,self.cubes).decide()
             self.cube_pub.publish(self.cubes[0].pix)
         else:
             self.cube_pub.publish(None)

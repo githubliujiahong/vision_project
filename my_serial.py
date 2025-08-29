@@ -62,9 +62,12 @@ class Serial(QThread):
         self.baudrate = self.config["baudrate"]
         self.port_name = self.config["port_name"]
         self.data_length = self.config["data_length"]
-        config = toml.load(os.path.join(ROOT, "config", "config.toml"))
-        self.arm_config = config["specific_config"]
-        self.arm_length = self.arm_config["decision"]["arm_length"]  
+        config = toml.load(os.path.join(ROOT, "config/config.toml"))
+        specific_config = config["specific_config"]
+        PATH = os.path.join(ROOT, "config", specific_config)
+        PATH = PATH.replace('/', os.sep).replace("\\", os.sep) # 确保路径字符串中的路径分隔符在不同操作系统下都是一致的，以便正确地处理路径。
+        config = toml.load(PATH)
+        self.arm_length = config["decision"]["arm_length"]
 
         self.position = [0, 0] # ?
         self.stop = False

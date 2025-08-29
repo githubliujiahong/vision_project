@@ -2,7 +2,7 @@ import Bridge, Debug, Position_calculate
 import numpy as np
 import time
 from Post_process import Mean_filter
-from Decision import Target
+# from Decision import Target
 
 num2type = ["cube", "ball", "ball", "ball", "ball", "ball", "ball", "box", "box", "box", "box", "box", "box", "big_box"]
 
