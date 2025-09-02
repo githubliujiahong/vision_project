@@ -20,9 +20,9 @@ class Position_calculator():
         self.image_shape = config["camera"]["image_shape"]
         self.new_K, roi = cv2.getOptimalNewCameraMatrix(self.K, self.D, self.image_shape, self.alpha, self.image_shape, True)
         self.camera_height = config["position_calculate"]["camera_height"]
-        # 解包config里的bc_vec，使之成为一个新的类型为float的列表，并将其转置
+        # 解包ciiionfig里的bc_vec，使之成为一个新的类型为float的列表，并将其转置
         self.c2b_vec = np.array(config["position_calculate"]["c2b_vec"], dtype=np.float32).reshape((3, 1))# ?
-        # 体心高度
+        # 体心到轴心的距离
         self.types_dis = {"floor":self.camera_height, "cube":self.camera_height - config["position_calculate"]["cube_height"],
                              "ball":self.camera_height - config["position_calculate"]["ball_height"] / 2,
                              "box":self.camera_height - config["position_calculate"]["box_height"]}
@@ -34,17 +34,17 @@ class Position_calculator():
         self.edge_threshold = config["position_calculate"]["edge_threshold"]
         self.arm_length = config["decision"]["arm_length"]
 
-        # 得到一个旋转矩阵（主要任务是用来矫正机械的锅
-        c2b_rotation_x = np.array([1, 0, 0]).reshape((3, 1)) * self.arm_tilt[0]
-        c2b_rotation_x = cv2.Rodrigues(c2b_rotation_x)[0]
-        c2b_rotation_y = np.array([0, 1, 0]).reshape((3, 1)) * self.arm_tilt[1]
-        c2b_rotation_y = cv2.Rodrigues(c2b_rotation_y)[0]
-        c2b_rotation_z = np.array([0, 0, 1]).reshape((3, 1)) * self.arm_tilt[2]
-        c2b_rotation_z = cv2.Rodrigues(c2b_rotation_z)[0]
+        # # 得到一个旋转矩阵（主要任务是用来矫正机械的锅
+        # c2b_rotation_x = np.array([1, 0, 0]).reshape((3, 1)) * self.arm_tilt[0]
+        # c2b_rotation_x = cv2.Rodrigues(c2b_rotation_x)[0]
+        # c2b_rotation_y = np.array([0, 1, 0]).reshape((3, 1)) * self.arm_tilt[1]
+        # c2b_rotation_y = cv2.Rodrigues(c2b_rotation_y)[0]
+        # c2b_rotation_z = np.array([0, 0, 1]).reshape((3, 1)) * self.arm_tilt[2]
+        # c2b_rotation_z = cv2.Rodrigues(c2b_rotation_z)[0]
         # self.c2b_rotation = c2b_rotation_z @ c2b_rotation_y @ c2b_rotation_x
-        print(f"{c2b_rotation_x = }")
-        print(f"{c2b_rotation_y = }")
-        print(f"{c2b_rotation_z = }")
+        # print(f"{c2b_rotation_x = }")
+        # print(f"{c2b_rotation_y = }")
+        # print(f"{c2b_rotation_z = }")
         T_BA = np.array(config["position_calculate"]["T_BA"], dtype=np.float32)
         self.c2b_rotation = T_BA[:3,:3]
 

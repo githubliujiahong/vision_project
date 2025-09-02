@@ -12,6 +12,8 @@ record = false
 [decision]
 arm_length = 34.1
 match_distance = 3
+time_score_ceil = 10
+time_score_floor = 0
 score_decrease_rate = 1.0
 score_increase_rate = 1.5
 safe_dis = 10
