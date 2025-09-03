@@ -582,6 +582,7 @@ class Main_window(QMainWindow):
             image = cv2.circle(image, self.click_point, 3, (255, 255, 255), -1)
             image = cv2.circle(image, self.click_point, 2, (255, 0, 0), -1)
             image = cv2.putText(image, "manual", self.click_point, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            print(f"manual target: {self.click_point}")
             if not self.debuger is None:
                 self.debuger.update_param("manual_R", np.linalg.norm(self.pc.pix2base(self.click_point, "floor") - self.pc.pix2base(self.camera_centre, "floor")))
         # 绘制双击输入目标的像素位置

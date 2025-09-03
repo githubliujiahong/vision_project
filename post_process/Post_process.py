@@ -278,7 +278,7 @@ class Post_processor(QThread):
                                                 self.publisher_log.publish("制定任务：手动放魔方")
                                                 print("throw cube")
                                                 action = 0x04
-                                                type = "floor"
+                                                type = "box"
                                             case 15:
                                                 self.publisher_log.publish("制定任务：手动抓边沿球")
                                                 action = 0x09
