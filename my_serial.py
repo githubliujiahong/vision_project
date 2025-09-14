@@ -149,9 +149,11 @@ class Serial(QThread):
         self.stop = True
 
     def get_new_protocol(self, order, R, theta):
-        theta_degree = (theta) / np.pi * 180
+        theta_degree = (theta) / np.pi * 180 + 2
         print(f"raw:{theta_degree = }, {R = }")
-        R_protocol = R / self.arm_length * 127
+        R_protocol = R / (self.arm_length+0.4) * 127
+        # R_protocol = R / 33.7 * 127
+
 
         print(f"{R_protocol = }")
         if theta_degree < 0:

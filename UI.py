@@ -582,7 +582,9 @@ class Main_window(QMainWindow):
             image = cv2.circle(image, self.click_point, 3, (255, 255, 255), -1)
             image = cv2.circle(image, self.click_point, 2, (255, 0, 0), -1)
             image = cv2.putText(image, "manual", self.click_point, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-            print(f"manual target: {self.click_point}")
+            # print(f"manual target: {self.click_point}")
+            print("manual target in base: ")
+            print(self.pc.pix2base(self.click_point, "floor"))
             if not self.debuger is None:
                 self.debuger.update_param("manual_R", np.linalg.norm(self.pc.pix2base(self.click_point, "floor") - self.pc.pix2base(self.camera_centre, "floor")))
         # 绘制双击输入目标的像素位置
@@ -592,18 +594,18 @@ class Main_window(QMainWindow):
         # 绘制相机中心
         image = cv2.circle(image, self.camera_centre, 1, (150, 0, 255), -1)
         # 绘制世界系原点在地面上的投影点在像素系下的位置
-        image = cv2.circle(image, self.origin_pix, 1, (255, 0, 0), -1)
+        image = cv2.circle(image, self.origin_pix, 1, (255, 0, 150), -1)
         # 绘制抓取范围
         image[self.ball_pts[:, 1], self.ball_pts[:, 0]] = [0, 0, 255]
         image[self.box_pts[:, 1], self.box_pts[:, 0]] = [255, 0, 0]
         # 绘制准星
-        aimed_centre = self.pc.base2pix(self.pc.polar2base([self.R, -np.pi / 2], "floor"))
-        left = np.array(aimed_centre - np.array([5, 0]), dtype=np.uint16)
-        right = np.array(aimed_centre + np.array([5, 0]), dtype=np.uint16)
-        up = np.array(aimed_centre - np.array([0, 5]), dtype=np.uint16)
-        down = np.array(aimed_centre + np.array([0, 5]), dtype=np.uint16)
-        image = cv2.line(image, left, right, (255, 0, 0), 2)
-        image = cv2.line(image, up, down, (255, 0, 0), 2)
+        # aimed_centre = self.pc.base2pix(self.pc.polar2base([self.R, -np.pi / 2], "floor"))
+        # left = np.array(aimed_centre - np.array([5, 0]), dtype=np.uint16)
+        # right = np.array(aimed_centre + np.array([5, 0]), dtype=np.uint16)
+        # up = np.array(aimed_centre - np.array([0, 5]), dtype=np.uint16)
+        # down = np.array(aimed_centre + np.array([0, 5]), dtype=np.uint16)
+        # image = cv2.line(image, left, right, (255, 0, 0), 2)
+        # image = cv2.line(image, up, down, (255, 0, 0), 2)
 
         # 修复1：OpenCV的resize函数要求尺寸为(width, height)，而非(height, width)
         # 计算新尺寸时交换宽高顺序
