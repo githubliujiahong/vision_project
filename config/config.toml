@@ -1,6 +1,6 @@
 debug = true
-use_serial = true
+use_serial = false
 # specific_config = "big_plane.toml"
-# specific_config = "small_plane.toml"
- specific_config = "spare_plane.toml"
+specific_config = "small_plane.toml"
+# specific_config = "spare_plane.toml"
 detect = true

@@ -18,7 +18,7 @@ class Subscriber(QObject):
         self.mutex = Mutex()
         self.name = topic_name
         
-        # 没有话题就创建
+
         if topic_name not in subsicribe_list.keys():
             subsicribe_list.add_topic(topic_name)
         subsicribe_list.append(self.name, self)
@@ -28,16 +28,16 @@ class Subscriber(QObject):
     
     def pub_message(self, message, timeout=None):
         if self.message_list.full():
-            self.message_list.get()  # 话题队列满了就弹出一个
+            self.message_list.get()  
         self.message_list.put(message, timeout=timeout)
     
     def is_empty(self):
         return self.message_list.empty()
 
-# 订阅者名单
+
 class Subsicribe_list(QObject):
     def __init__(self):
-        self.sub_list = {}  # 存储一个话题下有哪些订阅者
+        self.sub_list = {}  
         self.mutex = Mutex()
 
     def append(self, name:str,  subscriber:Subscriber):
@@ -67,7 +67,7 @@ class Publisher(QObject):
         self.name = name
         self.mutex = QMutex()
 
-        # 没有话题就创建
+      
         if name not in subsicribe_list.keys():
             subsicribe_list.add_topic(name)
 
@@ -75,4 +75,4 @@ class Publisher(QObject):
         sub_list = subsicribe_list.get_subscribers(self.name)
         for subsicriber in sub_list:
             now_piece = copy.deepcopy(message)  # 《引以为戒》
-            subsicriber.pub_message(now_piece, timeout=timeout)  # 挨个发送消息 
+            subsicriber.pub_message(now_piece, timeout=timeout)   

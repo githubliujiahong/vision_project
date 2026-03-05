@@ -6,7 +6,6 @@ import toml, os
 import serial, struct
 import numpy as np
 
-# 将一个十位数转为4个二进制八位数
 def intToBytes(value):
     src = [0,0,0,0]
     src[0] = value & 0xFF
@@ -36,11 +35,11 @@ def unsigned_int_to_8bit(int_num):
         if int_num > 255:
             raise Exception("cannot transform a number bigger than 255 into a uint8")
     return np.uint8(int_num)
-# 高位去掉
+
 def int_to_8bit(int_num):
     return int(int_num) & 0xFF
 
-def data_trans(raw_data): # 我们收到电控时的解码
+def data_trans(raw_data): 
     theta = raw_data[1] 
     R = raw_data[2]
     if raw_data[2] >= 128:
@@ -65,7 +64,7 @@ class Serial(QThread):
         config = toml.load(os.path.join(ROOT, "config/config.toml"))
         specific_config = config["specific_config"]
         PATH = os.path.join(ROOT, "config", specific_config)
-        PATH = PATH.replace('/', os.sep).replace("\\", os.sep) # 确保路径字符串中的路径分隔符在不同操作系统下都是一致的，以便正确地处理路径。
+        PATH = PATH.replace('/', os.sep).replace("\\", os.sep) 
         config = toml.load(PATH)
         self.arm_length = config["decision"]["arm_length"]
 
@@ -88,10 +87,10 @@ class Serial(QThread):
     def run(self):
         while not self.stop:
             try:
-                while self.serial.in_waiting:  # 串口中有数据等待时
-                    data = self.serial.read_all()  # 从串口读取数据，将字节转换成字符串并储存在data中
+                while self.serial.in_waiting:  
+                    data = self.serial.read_all()  
                     self.serial.flush()
-                    status = 0  # 0x53, 0x5A, 0x48, 0x59
+                    status = 0  
                     for index in range(len(data)):
                         match data[index]:
                             case 0x53:
@@ -158,7 +157,7 @@ class Serial(QThread):
         print(f"{R_protocol = }")
         if theta_degree < 0:
             theta_degree = int(theta_degree + 180)
-            R_protocol = int(-R_protocol)  # 这里可能由于位数问题导致转成1byte时符号位丢失
+            R_protocol = int(-R_protocol)  
         else:
             theta_degree = int(theta_degree)
             R_protocol = int(R_protocol)

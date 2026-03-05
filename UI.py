@@ -14,7 +14,7 @@ class UI_thread(QThread):
     def __init__(self, show_icon):
         super().__init__()
 
-        self.subscriber = Bridge.Subscriber("image")  # 设置一个叫“image”的订阅者
+        self.subscriber = Bridge.Subscriber("image")  
         self.detect_sub = Bridge.Subscriber("detect_res")
         self.ball_sub = Bridge.Subscriber("ball_pix")
         self.cube_sub = Bridge.Subscriber("cube_pix")
@@ -33,7 +33,6 @@ class UI_thread(QThread):
             try:
                 now_image = self.subscriber.get_message(0.05)
             except:
-                # print("Mainwindow fail to sub image!")
                 continue
             try:
                 self.detect_res = self.detect_sub.get_message(0.003)
@@ -43,13 +42,11 @@ class UI_thread(QThread):
             try:
                 self.ball_pix = self.ball_sub.get_message(0.003)
                 self.ball_pix = [int(self.ball_pix[0]), int(self.ball_pix[1])]
-                # print(f"{self.ball_pix = }")
             except:
                 pass
             try:
                 self.cube_pix = self.cube_sub.get_message(0.003)
                 self.cube_pix = [int(self.cube_pix[0]), int(self.cube_pix[1])]
-                # print(f"{self.cube_pix = }")
             except:
                 pass
             try:
@@ -86,13 +83,12 @@ class Main_window(QMainWindow):
         self.show_icon = self.config["show_icon"]
         self.color_his_path = self.config["color_his_path"]
         self.reshape_ratio = self.config["reshape_ratio"]
-        # 新增：当前缩放比例，全屏时会调整
         self.current_reshape_ratio = self.reshape_ratio
         
         config = toml.load(os.path.join(ROOT, "config/config.toml"))
         specific_config = config["specific_config"]
         PATH = os.path.join(ROOT, "config", specific_config)
-        PATH = PATH.replace('/', os.sep).replace("\\", os.sep) # 确保路径字符串中的路径分隔符在不同操作系统下都是一致的，以便正确地处理路径。
+        PATH = PATH.replace('/', os.sep).replace("\\", os.sep) 
         config = toml.load(PATH)
         K = np.array(config["camera"]["K"], dtype=np.float32)
         D = np.array(config["camera"]["D"], dtype=np.float32)
@@ -101,6 +97,7 @@ class Main_window(QMainWindow):
         new_K, roi = cv2.getOptimalNewCameraMatrix(K, D, self.image_size, alpha, self.image_size, True)
         self.camera_centre = np.array([int(new_K[0, 2]), int(new_K[1, 2])])
         self.arm_length = config["decision"]["arm_length"]
+        self.reach = 30
         
         self.post_process_th = post_process_th
         self.debuger = debuger
@@ -160,7 +157,6 @@ class Main_window(QMainWindow):
         q_image = QImage(np.zeros((height, width, 3), dtype=np.uint8), width, height, bytes_per_line, QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(q_image)
         self.image_label.setPixmap(pixmap)
-        # 图片显示
         layout = QHBoxLayout()
         image_layout = QVBoxLayout()
         tool_layout = QHBoxLayout()
@@ -542,64 +538,92 @@ class Main_window(QMainWindow):
     def update_image(self, bag):
         image, cube_pix, ball_pix, detect_res = bag
         box_pix = None
-        if self.normalization:
-            for i in range(3):
-                channel = image[:, :, i]
-                image[:, :, i] = cv2.equalizeHist(channel)
-        # 绘制识别框
-        if not detect_res is None:
-            if len(detect_res):
-                for det in detect_res:
-                    *xyxy, confidence, cls = det
-                    pt1 = [int(xyxy[0]), int(xyxy[1])]
-                    pt2 = [int(xyxy[2]), int(xyxy[3])]
-                    if int(cls) > 13 or int(cls) < 0:
-                        label = f"unknown {confidence:.2f}"
-                        image = cv2.rectangle(image, pt1, pt2, (0, 0, 255), 1)
-                        image = cv2.putText(image, label, [pt1[0] + 10, pt1[1] + 10], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-                    else:
-                        image = cv2.rectangle(image, pt1, pt2, self.get_color(int(cls)), 1)
-                        if int(cls) > 6:
-                            label = f"{self.names[int(cls)]} {confidence:.2f}"
-                            image = cv2.putText(image, label, [pt1[0] + 10, pt1[1] + 10], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-                        if int(cls) == 7:
-                            box_pix = (np.array(pt1) + np.array(pt2)) / 2
-        if not box_pix is None and not self.debuger is None:
-            self.debuger.update_param("box_R", np.linalg.norm(self.pc.pix2base(box_pix, "box")[:2, 0] - self.pc.pix2base(self.camera_centre, "box")[:2, 0]))
-        # 绘制自动识别目标的像素位置
-        if not ball_pix is None:
-            image = cv2.circle(image, ball_pix, 3, (0, 0, 255), -1)
-            image = cv2.putText(image, "TB", ball_pix, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-            if not self.debuger is None:
-                self.debuger.update_param("ball_R", np.linalg.norm(self.pc.pix2base(ball_pix, "ball")[:2, 0] - self.pc.pix2base(self.camera_centre, "ball")[:2, 0]))
-        if not cube_pix is None:
-            image = cv2.circle(image, cube_pix, 3, (0, 0, 255), 2)
-            image = cv2.putText(image, "TC", cube_pix, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-            if not self.debuger is None:
-                self.debuger.update_param("cube_R", np.linalg.norm(self.pc.pix2base(cube_pix, "cube")[:2, 0] - self.pc.pix2base(self.camera_centre, "cube")[:2, 0]))
-        # 绘制手动输入目标的像素位置
+        
+        
+        aimed_centre = self.pc.base2pix(self.pc.polar2base([self.R, -np.pi / 2], "floor"))
+        
         if not self.click_point is None:
-            image = cv2.circle(image, self.click_point, 3, (255, 255, 255), -1)
-            image = cv2.circle(image, self.click_point, 2, (255, 0, 0), -1)
+            image = cv2.circle(image, self.click_point, 1, (255, 255, 255), -1)
+            image = cv2.circle(image, self.click_point, 1, (255, 0, 0), -1)
             image = cv2.putText(image, "manual", self.click_point, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-            # print(f"manual target: {self.click_point}")
-            print("manual target in base: ")
-            print(self.pc.pix2base(self.click_point, "floor"))
             if not self.debuger is None:
                 self.debuger.update_param("manual_R", np.linalg.norm(self.pc.pix2base(self.click_point, "floor") - self.pc.pix2base(self.camera_centre, "floor")))
+            print(self.pc.pix2base(self.click_point, "floor"))
+            ax, ay = self.click_point
+            bx, by = aimed_centre
+            dx = bx - ax
+            dy = by - ay
+
+            # 中心点
+            if dx == 0 and dy == 0:
+                cv2.line(image, (ax - 5, ay), (ax + 5, ay), (255, 0, 0), 1)
+                cv2.line(image, (ax, ay - 5), (ax, ay + 5), (255, 0, 0), 1)
+            else:
+                norm = np.sqrt(dx**2 + dy**2)
+                ux, uy = dx / norm, dy / norm
+                perp_ux, perp_uy = -uy, ux
+                # 平行
+                # line1_p1 = (int(ax - ux * 5), int(ay - uy * 5))
+                # line1_p2 = (int(ax + ux * 5), int(ay + uy * 5))
+                # cv2.line(image, line1_p1, line1_p2, (255, 0, 0), 1)
+                
+                # # 垂直
+                # line2_p1 = (int(ax - perp_ux * 5), int(ay - perp_uy * 5))
+                # line2_p2 = (int(ax + perp_ux * 5), int(ay + perp_uy * 5))
+                # cv2.line(image, line2_p1, line2_p2, (255, 0, 0), 1)
+
+
+            if dx == 0 and dy == 0: 
+                # 水平方向
+                cv2.line(image, (int(ax - self.reach - 5), ay), (int(ax - self.reach + 5), ay), (0, 0, 255), 2)
+                cv2.line(image, (int(ax + self.reach - 5), ay), (int(ax + self.reach + 5), ay), (0, 0, 255), 2)
+                # 垂直方向
+                cv2.line(image, (ax, int(ay - self.reach - 5)), (ax, int(ay - self.reach + 5)), (0, 0, 255), 2)
+                cv2.line(image, (ax, int(ay + self.reach - 5)), (ax, int(ay + self.reach + 5)), (0, 0, 255), 2)
+            else:
+                norm = np.sqrt(dx**2 + dy**2)
+                ux, uy = dx / norm, dy / norm
+                perp_ux, perp_uy = -uy, ux
+                # 计算四个线条的中心点
+                line_center_1 = (int(ax + ux * self.reach), int(ay + uy * self.reach))
+                line_center_2 = (int(ax - ux * self.reach), int(ay - uy * self.reach))
+                
+                line_center_3 = (int(ax + perp_ux * self.reach), int(ay + perp_uy * self.reach))
+                line_center_4 = (int(ax - perp_ux * self.reach), int(ay - perp_uy * self.reach))
+                
+                # 绘制四条线
+                p1_start = (int(line_center_1[0] - perp_ux * 5), int(line_center_1[1] - perp_uy * 5))
+                p1_end = (int(line_center_1[0] + perp_ux * 5), int(line_center_1[1] + perp_uy * 5))
+                cv2.line(image, p1_start, p1_end, (0, 0, 255), 2)
+                
+                p2_start = (int(line_center_2[0] - perp_ux * 5), int(line_center_2[1] - perp_uy * 5))
+                p2_end = (int(line_center_2[0] + perp_ux * 5), int(line_center_2[1] + perp_uy * 5))
+                cv2.line(image, p2_start, p2_end, (0, 0, 255), 2)
+                
+                p3_start = (int(line_center_3[0] - ux * 5), int(line_center_3[1] - uy * 5))
+                p3_end = (int(line_center_3[0] + ux * 5), int(line_center_3[1] + uy * 5))
+                cv2.line(image, p3_start, p3_end, (0, 0, 255), 2)
+                
+                p4_start = (int(line_center_4[0] - ux * 5), int(line_center_4[1] - uy * 5))
+                p4_end = (int(line_center_4[0] + ux * 5), int(line_center_4[1] + uy * 5))
+                cv2.line(image, p4_start, p4_end, (0, 0, 255), 2)
+
+            
         # 绘制双击输入目标的像素位置
         if not self.double_click_point is None:
-            image = cv2.circle(image, self.double_click_point, 3, (0, 255, 0), -1)
+            image = cv2.circle(image, self.double_click_point, 1, (0, 255, 0), -1)
             image = cv2.putText(image, "place", self.double_click_point, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         # 绘制相机中心
         image = cv2.circle(image, self.camera_centre, 1, (150, 0, 255), -1)
         # 绘制世界系原点在地面上的投影点在像素系下的位置
-        image = cv2.circle(image, self.origin_pix, 1, (255, 0, 150), -1)
+        image = cv2.circle(image, self.origin_pix, 1, (255, 0, 0), -1)
         # 绘制抓取范围
         image[self.ball_pts[:, 1], self.ball_pts[:, 0]] = [0, 0, 255]
         image[self.box_pts[:, 1], self.box_pts[:, 0]] = [255, 0, 0]
         # 绘制准星
         # aimed_centre = self.pc.base2pix(self.pc.polar2base([self.R, -np.pi / 2], "floor"))
+        # # aimed_centre = self.centre
+        # image = cv2.circle(image, aimed_centre, 1, (255, 255, 0), -1)
         # left = np.array(aimed_centre - np.array([5, 0]), dtype=np.uint16)
         # right = np.array(aimed_centre + np.array([5, 0]), dtype=np.uint16)
         # up = np.array(aimed_centre - np.array([0, 5]), dtype=np.uint16)
@@ -607,7 +631,6 @@ class Main_window(QMainWindow):
         # image = cv2.line(image, left, right, (255, 0, 0), 2)
         # image = cv2.line(image, up, down, (255, 0, 0), 2)
 
-        # 修复1：OpenCV的resize函数要求尺寸为(width, height)，而非(height, width)
         # 计算新尺寸时交换宽高顺序
         new_width = int(self.current_reshape_ratio * image.shape[1])  # 宽度
         new_height = int(self.current_reshape_ratio * image.shape[0]) # 高度
@@ -753,6 +776,8 @@ class Main_window(QMainWindow):
         # S放下球
         elif event.key() == Qt.Key_S:
             self.throw_ball_callback()
+        elif event.key() == Qt.Key_F:
+            self.edge_ball_callback()
 
     # 窗口大小变化事件，用于检测全屏状态
     def resizeEvent(self, event):
