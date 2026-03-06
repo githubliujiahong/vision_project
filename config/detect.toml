@@ -1,2 +1,3 @@
-
+path = "./models/best.pt"
+path_ball = "./models/best_ball.pt"
 input_shape = [ 640, 640,]

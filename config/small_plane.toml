@@ -6,7 +6,7 @@ alpha = 1.1
 id = 1  
 rotate = false
 show_icon = false
-record_path = "record"
+record_path = "./record/record.mp4"
 record = true
 
 [decision]
